@@ -47,24 +47,22 @@ $newSettings['simplesef_strip_chars'] = empty($smcFunc['db_query']) ? '&quot,&am
 
 updateSettings($newSettings);
 
-// Add hooks (for 2.0)
-if (!empty($smcFunc['db_query'])) {
-    $sef_functions = array(
-        'integrate_pre_load' => 'SimpleSEF::convertQueryString',
-        'integrate_buffer' => 'SimpleSEF::ob_simplesef',
-        'integrate_redirect' => 'SimpleSEF::fixRedirectUrl',
-        'integrate_outgoing_email' => 'SimpleSEF::fixEmailOutput',
-        'integrate_exit' => 'SimpleSEF::fixXMLOutput',
-        'integrate_pre_include' => $sourcedir . '/SimpleSEF.php',
-        'integrate_load_theme' => 'SimpleSEF::loadTheme',
-        'integrate_admin_areas' => 'SimpleSEF::adminAreas',
-        'integrate_menu_buttons' => 'SimpleSEF::menuButtons',
-        'integrate_actions' => 'SimpleSEF::actionArray',
-    );
+// Add hooks
+$sef_functions = array(
+    'integrate_pre_load' => 'SimpleSEF::convertQueryString',
+    'integrate_buffer' => 'SimpleSEF::ob_simplesef',
+    'integrate_redirect' => 'SimpleSEF::fixRedirectUrl',
+    'integrate_outgoing_email' => 'SimpleSEF::fixEmailOutput',
+    'integrate_exit' => 'SimpleSEF::fixXMLOutput',
+    'integrate_pre_include' => $sourcedir . '/SimpleSEF.php',
+    'integrate_load_theme' => 'SimpleSEF::loadTheme',
+    'integrate_admin_areas' => 'SimpleSEF::adminAreas',
+    'integrate_menu_buttons' => 'SimpleSEF::menuButtons',
+    'integrate_actions' => 'SimpleSEF::actionArray',
+);
 
-    foreach ($sef_functions as $hook => $function)
-        add_integration_function($hook, $function, TRUE);
-}
+foreach ($sef_functions as $hook => $function)
+    add_integration_function($hook, $function, TRUE);
 
 if (addHtaccess() === false)
     log_error('Could not add or edit .htaccess file upon install of SimpleSEF', 'debug');
@@ -76,9 +74,6 @@ if (SMF == 'SSI') {
 
 function pre_install_check() {
     global $modSettings, $txt;
-
-    if (version_compare(PHP_VERSION, '5.0.0', '<'))
-        fatal_error('<b>PHP 5 or geater is required to install SimpleSEF.  Please remind your host that PHP4 is no longer maintained and ask that they upgrade you to PHP5.</b><br />');
 
     $char_set = empty($modSettings['global_character_set']) ? $txt['lang_character_set'] : $modSettings['global_character_set'];
     if ($char_set != 'ISO-8859-1' && $char_set != 'UTF-8' && !function_exists('iconv') && !function_exists('mb_convert_encoding') && !function_exists('unicode_decode'))

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<!DOCTYPE package-info SYSTEM "http://www.elkarte.net/site/package-info">
 <!-- ***** BEGIN LICENSE BLOCK *****
    - Version: MPL 1.1
    -
@@ -24,53 +24,36 @@
    -
    - ***** END LICENSE BLOCK ***** -->
 
-<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+<package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
     <id>slammeddime:simplesef</id>
     <name>SimpleSEF</name>
     <version>2.1</version>
     <type>modification</type>
 
-    <install for="2.0">
+    <install for="1.0 Alpha - 1.0.99">
         <readme parsebbc="true">readme.txt</readme>
         <code>add_settings.php</code>
-        <require-file from="./Packages/temp/SimpleSEF_2-0.php" name="SimpleSEF.php" destination="$sourcedir">Install the core SimpleSEF file</require-file>
+        <require-file name="SimpleSEF.php" destination="SOURCEDIR">Install the core SimpleSEF file</require-file>
         <require-file name="SimpleSEF.english.php" destination="$languagedir">Language file with all language strings</require-file>
         <require-file name="SimpleSEF.template.php" destination="$themedir">Template file for admin settings</require-file>
         <require-file name="SelectSwapper.js" destination="$themedir/scripts">Javascript for ignoring actions</require-file>
-        <require-dir name="SimpleSEF-Db" destination="$sourcedir">Directory containing all translation data for non ASCII characters</require-dir>
-        <create-dir name="SimpleSEF-Ext" destination="$sourcedir">Directory to store extensions in</create-dir>
+        <require-dir name="SimpleSEF-Db" destination="SOURCEDIR">Directory containing all translation data for non ASCII characters</require-dir>
+        <create-dir name="SimpleSEF-Ext" destination="SOURCEDIR">Directory to store extensions in</create-dir>
         <code type="inline"><![CDATA[<?php
-			global $sourcedir;
-			require_once($sourcedir . '/SimpleSEF.php');
+			require_once(SOURCEDIR . '/SimpleSEF.php');
 			SimpleSEF::fixHooks(TRUE);
 		]]>
         </code>
         <redirect type="inline" url="?action=admin;area=simplesef;sa=basic" timeout="7000">Thank you for installing SimpleSEF, you will now be redirected to the settings page.</redirect>
     </install>
 
-    <install for="1.1.0 - 1.1.99">
-        <readme parsebbc="true">readme.txt</readme>
-        <code>add_settings.php</code>
-        <modification type="file">install_1-1.xml</modification>
-        <require-file from="./Packages/temp/SimpleSEF_1-1.php" name="SimpleSEF.php" destination="$sourcedir" />
-        <require-dir name="SimpleSEF-Db" destination="$sourcedir" />
-        <create-dir name="SimpleSEF-Ext" destination="$sourcedir" />
-        <redirect url="?action=featuresettings;sa=simplesef" timeout="7" />
-    </install>
-
-    <uninstall for="2.0">
+    <install for="1.0 Alpha - 1.0.99">
         <code>remove_settings.php</code>
         <remove-file name="$languagedir/SimpleSEF.english.php" />
         <remove-file name="$themedir/SimpleSEF.template.php" />
         <remove-file name="$themedir/scripts/SelectSwapper.js" />
-        <remove-file name="$sourcedir/SimpleSEF.php" />
-        <remove-dir name="$sourcedir/SimpleSEF-Db" />
+        <remove-file name="SOURCEDIR/SimpleSEF.php" />
+        <remove-dir name="SOURCEDIR/SimpleSEF-Db" />
     </uninstall>
 
-    <uninstall for="1.1.0 - 1.1.99">
-        <code>remove_settings.php</code>
-        <modification type="file" reverse="true">install_1-1.xml</modification>
-        <remove-file name="$sourcedir/SimpleSEF.php" />
-        <remove-dir name="$sourcedir/SimpleSEF-Db" />
-    </uninstall>
 </package-info>

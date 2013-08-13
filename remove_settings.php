@@ -61,20 +61,16 @@ $sef_functions = array(
     'integrate_actions' => 'SimpleSEF::actionArray',
 );
 
-if (!empty($smcFunc['db_query'])) {
-    $smcFunc['db_query']('', '
+$smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}settings
 		WHERE variable IN ({array_string:settings})', array(
-        'settings' => $oldSettings,
-        )
-    );
+    'settings' => $oldSettings,
+    )
+);
 
-    // Remove hooks (for 2.0)
-    foreach ($sef_functions as $hook => $function)
-        remove_integration_function($hook, $function);
-}
-else
-    db_query("DELETE FROM {$db_prefix}settings WHERE variable IN ('" . implode('\', \'', array_merge($oldSettings, array_keys($sef_functions))) . "')", __FILE__, __LINE__);
+// Remove hooks (for 2.0)
+foreach ($sef_functions as $hook => $function)
+    remove_integration_function($hook, $function);
 
 if (removeHtaccess() === false)
     log_error('Could not remove or edit .htaccess file upon uninstall of SimpleSEF', 'debug');
