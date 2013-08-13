@@ -24,10 +24,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-function template_alias_settings() {
-    global $scripturl, $txt, $context;
+function template_alias_settings()
+{
+	global $scripturl, $txt, $context;
 
-    echo '
+	echo '
 	<div id="admincenter">
 		<form action="', $context['post_url'], '" method="post" accept-charset="', $context['character_set'], '">
 			<div class="cat_bar">
@@ -40,11 +41,11 @@ function template_alias_settings() {
 				<div class="content">
 					<p>', $txt['simplesef_alias_detail'], '</p>';
 
-    foreach ($context['simplesef_aliases'] as $original => $alias)
-        echo '
+	foreach ($context['simplesef_aliases'] as $original => $alias)
+		echo '
 					<div style="margin-top: 1ex;"><input type="text" name="original[]" value="', $original, '" size="20" /> => <input type="text" name="alias[]" value="', $alias, '" size="20" /></div>';
 
-    echo '
+	echo '
 					<noscript>
 						<div style="margin-top: 1ex;"><input type="text" name="original[]" size="20" class="input_text" /> => <input type="text" name="alias[]" size="20" class="input_text" /></div>
 					</noscript>
@@ -68,10 +69,11 @@ function template_alias_settings() {
 	<br class="clear" />';
 }
 
-function template_callback_simplesef_ignore() {
-    global $txt, $modSettings, $context;
+function template_callback_simplesef_ignore()
+{
+	global $txt, $modSettings, $context;
 
-    echo '
+	echo '
 		<dt>
 			<a id="simplesef_ignore"></a>
 			<span>
@@ -81,10 +83,10 @@ function template_callback_simplesef_ignore() {
 		</dt>
 		<dd>
 			<select id="dummy_actions" multiple="multiple" size="9" style="min-width: 100px;">';
-    foreach ($context['simplesef_dummy_actions'] as $action)
-        echo '
+	foreach ($context['simplesef_dummy_actions'] as $action)
+		echo '
 				<option value="', $action, '">', $action, '</option>';
-    echo '
+	echo '
 			</select>
 			<span style="text-align: center; display: inline-block;">
 				<input type="button" id="simplesef_ignore_add" value="&raquo;" /><br />
@@ -93,10 +95,10 @@ function template_callback_simplesef_ignore() {
 				<input type="button" id="simplesef_ignore_remove" value="&laquo;" /><br /><br />
 			</span>
 			<select id="dummy_ignore" multiple="multiple" size="9" style="min-width: 100px;">';
-    foreach ($context['simplesef_dummy_ignore'] as $action)
-        echo '
+	foreach ($context['simplesef_dummy_ignore'] as $action)
+		echo '
 				<option value="', $action, '">', $action, '</option>';
-    echo '
+	echo '
 			</select>
 			<input type="hidden" id="simplesef_ignore_actions" name="simplesef_ignore_actions" value="', !empty($modSettings['simplesef_ignore_actions']) ? $modSettings['simplesef_ignore_actions'] : '', '" />
 		</dd>';
