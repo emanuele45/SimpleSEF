@@ -139,14 +139,12 @@ class SimpleSEF
 	 * @global string $boardurl SMF's board url
 	 * @global array $modSettings
 	 * @global string $scripturl
-	 * @global array $smcFunc SMF's smcFunc array of functions
 	 * @global string $language
-	 * @global string $sourcedir
 	 * @return void
 	 */
 	public static function convertQueryString()
 	{
-		global $boardurl, $modSettings, $scripturl, $smcFunc, $language, $sourcedir;
+		global $boardurl, $modSettings, $scripturl, $language;
 
 		if (empty($modSettings['simplesef_enable']))
 			return;
@@ -197,7 +195,6 @@ class SimpleSEF
 	 * urls.  It will only rewrite urls for the site at hand, not other urls
 	 *
 	 * @global string $scripturl
-	 * @global array $smcFunc
 	 * @global string $boardurl
 	 * @global array $txt
 	 * @global array $modSettings
@@ -207,7 +204,7 @@ class SimpleSEF
 	 */
 	public static function ob_simplesef($buffer)
 	{
-		global $scripturl, $smcFunc, $boardurl, $txt, $modSettings, $context;
+		global $scripturl, $boardurl, $txt, $modSettings, $context;
 
 		if (empty($modSettings['simplesef_enable']))
 			return $buffer;
@@ -458,13 +455,12 @@ class SimpleSEF
 	 *
 	 * @global array $txt
 	 * @global array $context
-	 * @global string $sourcedir
 	 */
 	public static function ModifySimpleSEFSettings()
 	{
-		global $txt, $context, $sourcedir;
+		global $txt, $context;
 
-		require_once($sourcedir . '/ManageSettings.php');
+		require_once(ADMINDIR . '/ManageSettings.php');
 
 		$context['page_title'] = $txt['simplesef'];
 
@@ -500,12 +496,11 @@ class SimpleSEF
 	 * @global string $scripturl
 	 * @global array $txt
 	 * @global array $context
-	 * @global string $boarddir
 	 * @global array $modSettings
 	 */
 	public static function ModifyBasicSettings()
 	{
-		global $scripturl, $txt, $context, $boarddir, $modSettings;
+		global $scripturl, $txt, $context, $modSettings;
 
 		$config_vars = array(
 			array('check', 'simplesef_enable', 'subtext' => $txt['simplesef_enable_desc']),
@@ -532,10 +527,10 @@ class SimpleSEF
 			// We don't want to break boards, so we'll make sure some stuff exists before actually enabling
 			if (!empty($_POST['simplesef_enable']) && empty($modSettings['simplesef_enable']))
 			{
-				if (strpos($_SERVER['SERVER_SOFTWARE'], 'IIS') !== false && file_exists($boarddir . '/web.config'))
-					$_POST['simplesef_enable'] = strpos(implode('', file($boarddir . '/web.config')), '<action type="Rewrite" url="index.php?q={R:1}"') !== false ? 1 : 0;
-				elseif (strpos($_SERVER['SERVER_SOFTWARE'], 'IIS') === false && file_exists($boarddir . '/.htaccess'))
-					$_POST['simplesef_enable'] = strpos(implode('', file($boarddir . '/.htaccess')), 'RewriteRule ^(.*)$ index.php') !== false ? 1 : 0;
+				if (strpos($_SERVER['SERVER_SOFTWARE'], 'IIS') !== false && file_exists(BOARDDIR . '/web.config'))
+					$_POST['simplesef_enable'] = strpos(implode('', file(BOARDDIR . '/web.config')), '<action type="Rewrite" url="index.php?q={R:1}"') !== false ? 1 : 0;
+				elseif (strpos($_SERVER['SERVER_SOFTWARE'], 'IIS') === false && file_exists(BOARDDIR . '/.htaccess'))
+					$_POST['simplesef_enable'] = strpos(implode('', file(BOARDDIR . '/.htaccess')), 'RewriteRule ^(.*)$ index.php') !== false ? 1 : 0;
 				elseif (strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false)
 					$_POST['simplesef_enable'] = 1;
 				elseif (strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false)
@@ -559,13 +554,12 @@ class SimpleSEF
 	 * @global string $scripturl
 	 * @global array $txt
 	 * @global array $context
-	 * @global string $boarddir
 	 * @global array $modSettings
 	 * @global array $settings
 	 */
 	public static function ModifyAdvancedSettings()
 	{
-		global $scripturl, $txt, $context, $boarddir, $modSettings, $settings;
+		global $scripturl, $txt, $context, $modSettings, $settings;
 
 		loadTemplate('SimpleSEF');
 		$config_vars = array(
@@ -691,14 +685,13 @@ class SimpleSEF
 	 * This is a helper function of sorts that actually creates the SEF urls.
 	 * It compiles the different parts of a normal URL into a SEF style url
 	 *
-	 * @global string $sourcedir
 	 * @global array $modSettings
 	 * @param string $url URL to SEFize
 	 * @return string Either the original url if not enabled or ignored, or a new URL
 	 */
 	public static function create_sef_url($url)
 	{
-		global $sourcedir, $modSettings;
+		global $modSettings;
 
 		if (empty($modSettings['simplesef_enable']))
 			return $url;
@@ -737,7 +730,7 @@ class SimpleSEF
 
 		if (!empty($query_parts['action']) && !empty(self::$extensions[$query_parts['action']]))
 		{
-			require_once($sourcedir . '/SimpleSEF-Ext/' . self::$extensions[$query_parts['action']]);
+			require_once(SOURCEDIR . '/SimpleSEF-Ext/' . self::$extensions[$query_parts['action']]);
 			$class = ucwords($query_parts['action']);
 			$extension = new $class();
 			$sefstring2 = $extension->create($params);
@@ -793,13 +786,15 @@ class SimpleSEF
 
 	public static function fixHooks($force = FALSE)
 	{
-		global $smcFunc, $modSettings;
+		global $modSettings;
 
 		// We only do this once an hour, no need to overload things
 		if (!$force && cache_get_data('simplesef_fixhooks', 3600) !== NULL)
 			return;
 
-		$request = $smcFunc['db_query']('', '
+		$db = database();
+
+		$request = $db->query('', '
 			SELECT variable, value
 			FROM {db_prefix}settings
 			WHERE variable LIKE {string:variable}', array(
@@ -808,9 +803,9 @@ class SimpleSEF
 		);
 
 		$hooks = array();
-		while (($row = $smcFunc['db_fetch_assoc']($request)))
+		while (($row = $db->fetch_assoc($request)))
 			$hooks[$row['variable']] = $row['value'];
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		self::$queryCount++;
 
 		$fixups = array();
@@ -909,13 +904,12 @@ class SimpleSEF
 	 * If the topic isn't prepopulated, it attempts to find it.
 	 *
 	 * @global array $modSettings
-	 * @global array $smcFunc
 	 * @param int $id
 	 * @return string Topic name with it's associated board name
 	 */
 	private static function getTopicName($id)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
 
 		@list($value, $start) = explode('.', $id);
 		if (!isset($start))
@@ -948,13 +942,12 @@ class SimpleSEF
 	 * pregeneration information
 	 *
 	 * @global array $modSettings
-	 * @global array $smcFunc
 	 * @param int $id User ID
 	 * @return string User name
 	 */
 	private static function getUserName($id)
 	{
-		global $modSettings, $smcFunc;
+		global $modSettings;
 
 		if (!empty($modSettings['simplesef_simple']) || !is_numeric($id))
 			return 'user' . $modSettings['simplesef_space'] . $id;
@@ -976,13 +969,12 @@ class SimpleSEF
 	 *
 	 * @global string $boardurl
 	 * @global array $modSettings
-	 * @global string $sourcedir
 	 * @param string $query Querystring to deal with
 	 * @return array Returns an array suitable to be merged with $_GET
 	 */
 	private static function route($query)
 	{
-		global $boardurl, $modSettings, $sourcedir;
+		global $boardurl, $modSettings;
 
 		$url_parts = explode('/', trim($query, '/'));
 		$querystring = array();
@@ -1011,7 +1003,7 @@ class SimpleSEF
 
 			if (!empty(self::$extensions[$querystring['action']]))
 			{
-				require_once($sourcedir . '/SimpleSEF-Ext/' . self::$extensions[$querystring['action']]);
+				require_once(SOURCEDIR . '/SimpleSEF-Ext/' . self::$extensions[$querystring['action']]);
 				$class = ucwords($querystring['action']);
 				$extension = new $class();
 				$querystring += $extension->route($url_parts);
@@ -1075,16 +1067,12 @@ class SimpleSEF
 
 	/**
 	 * Loads any extensions that other mod authors may have introduced
-	 *
-	 * @global string $sourcedir
 	 */
 	private static function loadExtensions($force = FALSE)
 	{
-		global $sourcedir;
-
 		if ($force || (self::$extensions = cache_get_data('simplsef_extensions', 3600)) === NULL)
 		{
-			$ext_dir = $sourcedir . '/SimpleSEF-Ext';
+			$ext_dir = SOURCEDIR . '/SimpleSEF-Ext';
 			self::$extensions = array();
 			if (is_readable($ext_dir))
 			{
@@ -1108,23 +1096,24 @@ class SimpleSEF
 	 * Loads all board names from the forum into a variable and cache (if possible)
 	 * This helps reduce the number of queries needed for SimpleSEF to run
 	 *
-	 * @global array $smcFunc
 	 * @global string $language
 	 * @param boolean $force Forces a reload of board names
 	 */
 	private static function loadBoardNames($force = FALSE)
 	{
-		global $smcFunc, $language;
+		global $language;
 
 		if ($force || (self::$boardNames = cache_get_data('simplesef_board_list', 3600)) == NULL)
 		{
+			$db = database();
+
 			loadLanguage('index', $language, false);
-			$request = $smcFunc['db_query']('', '
+			$request = $db->query('', '
 				SELECT id_board, name
 				FROM {db_prefix}boards', array()
 			);
 			$boards = array();
-			while ($row = $smcFunc['db_fetch_assoc']($request))
+			while ($row = $db->fetch_assoc($request))
 			{
 				// A bit extra overhead to account for duplicate board names
 				$temp_name = self::encode($row['name']);
@@ -1133,7 +1122,7 @@ class SimpleSEF
 					$i++;
 				$boards[$temp_name . (!empty($i) ? $i + 1 : '')] = $row['id_board'];
 			}
-			$smcFunc['db_free_result']($request);
+			$db->free_result($request);
 
 			self::$boardNames = array_flip($boards);
 
@@ -1148,17 +1137,15 @@ class SimpleSEF
 	 * Takes one or more topic id's, grabs their information from the database
 	 * and stores it for later use.  Helps keep queries to a minimum.
 	 *
-	 * @global array $smcFunc
 	 * @param mixed $ids Can either be a single id or an array of ids
 	 */
 	private static function loadTopicNames($ids)
 	{
-		global $smcFunc;
-
 		$ids = is_array($ids) ? $ids : array($ids);
+		$db = database();
 
 		// Fill the topic 'cache' in one fell swoop
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT t.id_topic, m.subject, t.id_board
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -1166,14 +1153,14 @@ class SimpleSEF
 			'topics' => $ids,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 		{
 			self::$topicNames[$row['id_topic']] = array(
 				'subject' => self::encode($row['subject']),
 				'board_id' => $row['id_board'],
 			);
 		}
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		self::$queryCount++;
 	}
 
@@ -1181,25 +1168,23 @@ class SimpleSEF
 	 * Takes one or more user ids and stores the usernames for those users for
 	 * later user
 	 *
-	 * @global array $smcFunc
 	 * @param mixed $ids can be either a single id or an array of them
 	 */
 	private static function loadUserNames($ids)
 	{
-		global $smcFunc;
-
 		$ids = is_array($ids) ? $ids : array($ids);
+		$db = database();
 
-		$request = $smcFunc['db_query']('', '
+		$request = $db->query('', '
 			SELECT id_member, real_name
 			FROM {db_prefix}members
 			WHERE id_member IN ({array_int:members})', array(
 			'members' => $ids,
 			)
 		);
-		while ($row = $smcFunc['db_fetch_assoc']($request))
+		while ($row = $db->fetch_assoc($request))
 			self::$userNames[$row['id_member']] = self::encode($row['real_name']);
-		$smcFunc['db_free_result']($request);
+		$db->free_result($request);
 		self::$queryCount++;
 	}
 
@@ -1210,7 +1195,6 @@ class SimpleSEF
 	 * transliterate them.
 	 *
 	 * @global array $modSettings
-	 * @global string $sourcedir
 	 * @global array $txt
 	 * @staticvar array $utf8_db
 	 * @param string $string String to encode
@@ -1218,7 +1202,7 @@ class SimpleSEF
 	 */
 	private static function encode($string)
 	{
-		global $modSettings, $sourcedir, $txt;
+		global $modSettings, $txt;
 		static $utf8_db = array();
 
 		if (empty($string))
@@ -1291,7 +1275,7 @@ class SimpleSEF
 			if (!isset($utf8_db[$charBank]))
 			{
 				// Load up the bank if it's not already in memory
-				$dbFile = $sourcedir . '/SimpleSEF-Db/x' . sprintf('%02x', $charBank) . '.php';
+				$dbFile = SOURCEDIR . '/SimpleSEF-Db/x' . sprintf('%02x', $charBank) . '.php';
 
 				if (!is_readable($dbFile) || !@include_once($dbFile))
 					$utf8_db[$charBank] = array();
