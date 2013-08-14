@@ -57,7 +57,6 @@ $txt['simplesef_space'] = 'Space';
 $txt['simplesef_space_desc'] = 'Character to be used for spaces in the url.  Typically _ or -.';
 $txt['simplesef_suffix'] = 'Topic Extension';
 $txt['simplesef_suffix_desc'] = 'URL extension to use on topics (ie: html, php).';
-$txt['simplesef_suffix_required'] = 'An extension is required';
 $txt['simplesef_strip_words'] = 'Words to strip';
 $txt['simplesef_strip_words_desc'] = 'These are words that will be stripped out of urls.  This creates shorter, yet still readable urls.  The words you wish to strip should be seperated by a comma (no spaces).';
 $txt['simplesef_strip_chars'] = 'Characters to strip';

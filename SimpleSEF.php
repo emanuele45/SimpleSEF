@@ -701,7 +701,7 @@ class SimpleSEF
 		if (!isset($start))
 			$start = '0';
 		if (!empty($modSettings['simplesef_simple']) || !is_numeric($value))
-			return 'topic' . $modSettings['simplesef_space'] . $id . '.' . $modSettings['simplesef_suffix'];
+			return 'topic' . $modSettings['simplesef_space'] . $id . (!empty($modSettings['simplesef_suffix']) ? '.' . $modSettings['simplesef_suffix'] : '/');
 
 		// If the topic id isn't here (probably from a redirect) we need a query to get it
 		if (empty(self::$topicNames[$value]))
@@ -715,12 +715,12 @@ class SimpleSEF
 		}
 		else
 		{
-			$topicName = self::$topicNames[$value]['subject'];
+			$topicName = 't/' . self::$topicNames[$value]['subject'];
 			$boardName = self::getBoardName(self::$topicNames[$value]['board_id']);
 		}
 
 		// Put it all together
-		return $boardName . '/' . $topicName . $modSettings['simplesef_space'] . $value . '.' . $start . '.' . $modSettings['simplesef_suffix'];
+		return $boardName . '/' . $topicName . $modSettings['simplesef_space'] . $value . '.' . $start . (!empty($modSettings['simplesef_suffix']) ? '.' . $modSettings['simplesef_suffix'] : '/');
 	}
 
 	/**
@@ -803,7 +803,8 @@ class SimpleSEF
 		if (!empty($url_parts))
 		{
 			$current_value = array_pop($url_parts);
-			if (strrpos($current_value, $modSettings['simplesef_suffix']))
+
+			if (strrpos($current_value, $modSettings['simplesef_suffix']) || $url_parts[count($url_parts) - 1] == 't')
 			{
 				// remove the suffix and get the topic id
 				$topic = str_replace($modSettings['simplesef_suffix'], '', $current_value);
@@ -812,7 +813,12 @@ class SimpleSEF
 
 				// remove the board name too
 				if (empty($modSettings['simplesef_simple']))
+				{
+					if ($url_parts[count($url_parts) - 1] == 't')
+						array_pop($url_parts);
+
 					array_pop($url_parts);
+				}
 			}
 			else
 			{

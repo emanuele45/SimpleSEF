@@ -107,9 +107,6 @@ class SimpleSEF_Controller extends Action_Controller
 		{
 			checkSession();
 
-			if (trim($_POST['simplesef_suffix']) == '')
-				fatal_lang_error('simplesef_suffix_required');
-
 			$_POST['simplesef_suffix'] = trim($_POST['simplesef_suffix'], '.');
 
 			$save_vars = $config_vars;
