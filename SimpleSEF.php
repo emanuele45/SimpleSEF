@@ -83,7 +83,7 @@ class SimpleSEF
 	/**
 	 * @var bool Properly track redirects
 	 */
-	private static $redirect = FALSE;
+	private static $redirect = false;
 
 	/**
 	 * Initialize the mod and it's settings.  We can't use a constructor
@@ -95,14 +95,14 @@ class SimpleSEF
 	 * @param boolean $force Force the init to run again if already done
 	 * @return void
 	 */
-	public static function init($force = FALSE)
+	public static function init($force = false)
 	{
 		global $modSettings;
-		static $done = FALSE;
+		static $done = false;
 
 		if ($done && !$force)
 			return;
-		$done = TRUE;
+		$done = true;
 
 		self::$actions = !empty($modSettings['simplesef_actions']) ? explode(',', $modSettings['simplesef_actions']) : array();
 		self::$ignoreactions = array_merge(self::$ignoreactions, !empty($modSettings['simplesef_ignore_actions']) ? explode(',', $modSettings['simplesef_ignore_actions']) : array());
@@ -121,12 +121,12 @@ class SimpleSEF
 		self::loadExtensions($force);
 		self::fixHooks($force);
 
-		self::log('Pre-fix GET:' . var_export($_GET, TRUE));
+		self::log('Pre-fix GET:' . var_export($_GET, true));
 
 		// We need to fix our GET array too...
 		parse_str(preg_replace('~&(\w+)(?=&|$)~', '&$1=', strtr($_SERVER['QUERY_STRING'], array(';?' => '&', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
 
-		self::log('Post-fix GET:' . var_export($_GET, TRUE), 'Init Complete (forced: ' . ($force ? 'true' : 'false') . ')');
+		self::log('Post-fix GET:' . var_export($_GET, true), 'Init Complete (forced: ' . ($force ? 'true' : 'false') . ')');
 	}
 
 	/**
@@ -212,8 +212,7 @@ class SimpleSEF
 		self::benchmark('buffer');
 
 		// Bump up our memory limit a bit
-		if (@ini_get('memory_limit') < 128)
-			@ini_set('memory_limit', '128M');
+		setMemoryLimit('128M');
 
 		// Grab the topics...
 		$matches = array();
@@ -346,14 +345,14 @@ class SimpleSEF
 	 * @param string $subject The subject of the email
 	 * @param string $message Body of the email
 	 * @param string $header Header of the email (we don't adjust this)
-	 * @return boolean Always returns TRUE to prevent SMF from erroring
+	 * @return boolean Always returns true to prevent SMF from erroring
 	 */
 	public static function fixEmailOutput(&$subject, &$message, &$header)
 	{
 		global $modSettings;
 
 		if (empty($modSettings['simplesef_enable']))
-			return TRUE;
+			return true;
 
 		// We're just fixing the subject and message
 		$subject = self::ob_simplesef($subject);
@@ -362,7 +361,7 @@ class SimpleSEF
 		self::log('Rewriting email output');
 
 		// We must return true, otherwise we fail!
-		return TRUE;
+		return true;
 	}
 
 	/**
@@ -381,7 +380,7 @@ class SimpleSEF
 	{
 		header('HTTP/1.0 404 Not Found');
 		self::log('404 Not Found: ' . $_SERVER['REQUEST_URL']);
-		fatal_lang_error('simplesef_404', FALSE);
+		fatal_lang_error('simplesef_404', false);
 	}
 
 	/**
@@ -405,13 +404,13 @@ class SimpleSEF
 		$counter = array_search('featuresettings', array_keys($menu_buttons['admin']['sub_buttons'])) + 1;
 
 		$menu_buttons['admin']['sub_buttons'] = array_merge(
-			array_slice($menu_buttons['admin']['sub_buttons'], 0, $counter, TRUE), array('simplesef' => array(
+			array_slice($menu_buttons['admin']['sub_buttons'], 0, $counter, true), array('simplesef' => array(
 				'title' => $txt['simplesef'],
 				'href' => $scripturl . '?action=admin;area=simplesef',
 				'sub_buttons' => array(
 					'basic' => array('title' => $txt['simplesef_basic'], 'href' => $scripturl . '?action=admin;area=simplesef;sa=basic'),
 				),
-			)), array_slice($menu_buttons['admin']['sub_buttons'], $counter, count($menu_buttons['admin']['sub_buttons']), TRUE)
+			)), array_slice($menu_buttons['admin']['sub_buttons'], $counter, count($menu_buttons['admin']['sub_buttons']), true)
 		);
 
 		if (!empty($modSettings['simplesef_advanced']))
@@ -437,7 +436,7 @@ class SimpleSEF
 		$counter = array_search('featuresettings', array_keys($admin_areas['config']['areas'])) + 1;
 
 		$admin_areas['config']['areas'] = array_merge(
-			array_slice($admin_areas['config']['areas'], 0, $counter, TRUE), array('simplesef' => array(
+			array_slice($admin_areas['config']['areas'], 0, $counter, true), array('simplesef' => array(
 				'label' => $txt['simplesef'],
 				'function' => create_function(NULL, 'SimpleSEF::ModifySimpleSEFSettings();'),
 				'icon' => 'search.gif',
@@ -446,7 +445,7 @@ class SimpleSEF
 					'advanced' => array($txt['simplesef_advanced'], 'enabled' => !empty($modSettings['simplesef_advanced'])),
 					'alias' => array($txt['simplesef_alias'], 'enabled' => !empty($modSettings['simplesef_advanced'])),
 				),
-			)), array_slice($admin_areas['config']['areas'], $counter, count($admin_areas['config']['areas']), TRUE)
+			)), array_slice($admin_areas['config']['areas'], $counter, count($admin_areas['config']['areas']), true)
 		);
 	}
 
@@ -784,7 +783,7 @@ class SimpleSEF
 		return str_replace('index.php' . (!empty($url_parts['query']) ? '?' . $url_parts['query'] : ''), $sefstring, $url); //$boardurl . '/' . $sefstring . (!empty($url_parts['fragment']) ? '#' . $url_parts['fragment'] : '');
 	}
 
-	public static function fixHooks($force = FALSE)
+	public static function fixHooks($force = false)
 	{
 		global $modSettings;
 
@@ -829,9 +828,9 @@ class SimpleSEF
 		foreach ($fixups as $hook => $functions)
 			$modSettings[$hook] = str_replace($hooks[$hook], $fixups[$hook], $modSettings[$hook]);
 
-		cache_put_data('simplesef_fixhooks', TRUE, 3600);
+		cache_put_data('simplesef_fixhooks', true, 3600);
 
-		self::log('Fixed up integration hooks: ' . var_export($fixups, TRUE));
+		self::log('Fixed up integration hooks: ' . var_export($fixups, true));
 	}
 
 	/*	 * ******************************************
@@ -890,7 +889,7 @@ class SimpleSEF
 			}
 
 			if (empty(self::$boardNames[$id]))
-				self::loadBoardNames(TRUE);
+				self::loadBoardNames(true);
 			$boardName = !empty(self::$boardNames[$id]) ? self::$boardNames[$id] : 'board';
 			if (isset($page) && ($page > 0))
 				$boardName = $boardName . $modSettings['simplesef_space'] . $page;
@@ -986,7 +985,7 @@ class SimpleSEF
 			$querystring['action'] = array_shift($url_parts);
 
 			// We may need to fix the action
-			if (($reverse_alias = array_search($current_value, self::$aliasactions)) !== FALSE)
+			if (($reverse_alias = array_search($current_value, self::$aliasactions)) !== false)
 				$querystring['action'] = $reverse_alias;
 			$current_value = reset($url_parts);
 
@@ -1060,7 +1059,7 @@ class SimpleSEF
 			}
 		}
 
-		self::log('Rerouted "' . $query . '" to ' . var_export($querystring, TRUE));
+		self::log('Rerouted "' . $query . '" to ' . var_export($querystring, true));
 
 		return $querystring;
 	}
@@ -1068,7 +1067,7 @@ class SimpleSEF
 	/**
 	 * Loads any extensions that other mod authors may have introduced
 	 */
-	private static function loadExtensions($force = FALSE)
+	private static function loadExtensions($force = false)
 	{
 		if ($force || (self::$extensions = cache_get_data('simplsef_extensions', 3600)) === NULL)
 		{
@@ -1099,7 +1098,7 @@ class SimpleSEF
 	 * @global string $language
 	 * @param boolean $force Forces a reload of board names
 	 */
-	private static function loadBoardNames($force = FALSE)
+	private static function loadBoardNames($force = false)
 	{
 		global $language;
 
@@ -1323,11 +1322,11 @@ class SimpleSEF
 	{
 		if (!empty(self::$benchMark['marks'][$marker]))
 		{
-			self::$benchMark['marks'][$marker]['stop'] = microtime(TRUE);
+			self::$benchMark['marks'][$marker]['stop'] = microtime(true);
 			self::$benchMark['total'] += self::$benchMark['marks'][$marker]['stop'] - self::$benchMark['marks'][$marker]['start'];
 		}
 		else
-			self::$benchMark['marks'][$marker]['start'] = microtime(TRUE);
+			self::$benchMark['marks'][$marker]['start'] = microtime(true);
 	}
 
 	/**
