@@ -21,6 +21,7 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
+ *   emanuele (Adapted to ElkArte)
  *
  * ***** END LICENSE BLOCK ***** */
 
