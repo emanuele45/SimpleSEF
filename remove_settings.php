@@ -24,12 +24,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-// If SSI.php is in the same place as this file, and SMF isn't defined, this is being run standalone.
-if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('SMF'))
+// If SSI.php is in the same place as this file, and ELK isn't defined, this is being run standalone.
+if (file_exists(dirname(__FILE__) . '/SSI.php') && !defined('ELK'))
 	require_once(dirname(__FILE__) . '/SSI.php');
-// Hmm... no SSI.php and no SMF?
-elseif (!defined('SMF'))
-	die('<b>Error:</b> Cannot install - please verify you put this in the same place as SMF\'s index.php.');
+// Hmm... no SSI.php and no ELK?
+elseif (!defined('ELK'))
+	die('<b>Error:</b> Cannot install - please verify you put this in the same place as ELK\'s index.php.');
 
 // List settings here
 $oldSettings = array(
@@ -75,7 +75,7 @@ foreach ($sef_functions as $hook => $function)
 if (removeHtaccess() === false)
 	log_error('Could not remove or edit .htaccess file upon uninstall of SimpleSEF', 'debug');
 
-if (SMF == 'SSI')
+if (ELK == 'SSI')
 {
 	fatal_error('<b>This isn\'t really an error, just a message telling you that the settings have been removed from the database!</b><br />');
 	@unlink(__FILE__);

@@ -25,7 +25,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 // No Direct Access!
-if (!defined('SMF'))
+if (!defined('ELK'))
 	die('Hacking attempt...');
 
 class SimpleSEF
@@ -90,7 +90,7 @@ class SimpleSEF
 	 * might change this in the future (either singleton or two classes,
 	 * one to handle the integration hooks and one that does the dirty work)
 	 *
-	 * @global array $modSettings SMF's modSettings variable
+	 * @global array $modSettings ELK's modSettings variable
 	 * @staticvar boolean $done Says if this has been done already
 	 * @param boolean $force Force the init to run again if already done
 	 * @return void
@@ -136,7 +136,7 @@ class SimpleSEF
 	 * Will have to figure out how to do some checking of other types of SEF mods
 	 * and be able to rewrite those as well.  Currently we only rewrite our own urls
 	 *
-	 * @global string $boardurl SMF's board url
+	 * @global string $boardurl ELK's board url
 	 * @global array $modSettings
 	 * @global string $scripturl
 	 * @global string $language
@@ -164,7 +164,7 @@ class SimpleSEF
 		if (!empty($modSettings['queryless_urls']))
 			updateSettings(array('queryless_urls' => '0'));
 
-		if (SMF == 'SSI')
+		if (ELK == 'SSI')
 			return;
 
 		// if the URL contains index.php but not our ignored actions, rewrite the URL
@@ -199,7 +199,7 @@ class SimpleSEF
 	 * @global array $txt
 	 * @global array $modSettings
 	 * @global array $context
-	 * @param string $buffer The output buffer after SMF has output the templates
+	 * @param string $buffer The output buffer after ELK has output the templates
 	 * @return string Returns the altered buffer (or unaltered if the mod is disabled)
 	 */
 	public static function ob_simplesef($buffer)
@@ -250,7 +250,7 @@ class SimpleSEF
 			'%1.html$d\',' => '%1$d.html\',', // Page index on MessageIndex for topics
 			$boardurl . '/topic/' => $scripturl . '?topic=', // Also for above
 			'%1_%1$d/\',' => '%1$d/\',', // Page index on Members listing
-			'var smf_scripturl = "' . $boardurl . '/' => 'var smf_scripturl = "' . $scripturl,
+			'var elk_scripturl = "' . $boardurl . '/' => 'var elk_scripturl = "' . $scripturl,
 		);
 		$buffer = str_replace(array_keys($extra_replacements), array_values($extra_replacements), $buffer);
 
@@ -280,7 +280,7 @@ class SimpleSEF
 
 	/**
 	 * Implements integrate_redirect
-	 * When SMF calls redirectexit, we need to rewrite the URL its redirecting to
+	 * When ELK calls redirectexit, we need to rewrite the URL its redirecting to
 	 * Without this, the convertQueryString would catch it, but would cause an
 	 * extra page load.  This helps reduce server load and streamlines redirects
 	 *
@@ -307,9 +307,9 @@ class SimpleSEF
 
 	/**
 	 * Implements integrate_exit
-	 * When SMF outputs XML data, the buffer function is never called.  To
-	 * circumvent this, we use the _exit hook which is called just before SMF
-	 * exits.  If SMF didn't output a footer, it typically didn't run through
+	 * When ELK outputs XML data, the buffer function is never called.  To
+	 * circumvent this, we use the _exit hook which is called just before ELK
+	 * exits.  If ELK didn't output a footer, it typically didn't run through
 	 * our output buffer.  This catches the buffer and runs it through.
 	 *
 	 * @global array $modSettings
@@ -345,7 +345,7 @@ class SimpleSEF
 	 * @param string $subject The subject of the email
 	 * @param string $message Body of the email
 	 * @param string $header Header of the email (we don't adjust this)
-	 * @return boolean Always returns true to prevent SMF from erroring
+	 * @return boolean Always returns true to prevent ELK from erroring
 	 */
 	public static function fixEmailOutput(&$subject, &$message, &$header)
 	{
@@ -366,7 +366,7 @@ class SimpleSEF
 
 	/**
 	 * Implements integrate_actions
-	 * @param array $actions SMF's actions array
+	 * @param array $actions ELK's actions array
 	 */
 	public static function actionArray(&$actions)
 	{
@@ -438,7 +438,9 @@ class SimpleSEF
 		$admin_areas['config']['areas'] = array_merge(
 			array_slice($admin_areas['config']['areas'], 0, $counter, true), array('simplesef' => array(
 				'label' => $txt['simplesef'],
-				'function' => create_function(NULL, 'SimpleSEF::ModifySimpleSEFSettings();'),
+				'file' => 'ManageSimpleSEF.controller.php',
+				'controller' => 'SimpleSEF_Controller',
+				'function' => 'action_index',
 				'icon' => 'search.gif',
 				'subsections' => array(
 					'basic' => array($txt['simplesef_basic']),
@@ -447,228 +449,6 @@ class SimpleSEF
 				),
 			)), array_slice($admin_areas['config']['areas'], $counter, count($admin_areas['config']['areas']), true)
 		);
-	}
-
-	/**
-	 * Directs the admin to the proper page of settings for SimpleSEF
-	 *
-	 * @global array $txt
-	 * @global array $context
-	 */
-	public static function ModifySimpleSEFSettings()
-	{
-		global $txt, $context;
-
-		require_once(ADMINDIR . '/ManageSettings.php');
-
-		$context['page_title'] = $txt['simplesef'];
-
-		$subActions = array(
-			'basic' => array('SimpleSEF', 'ModifyBasicSettings'),
-			'advanced' => array('SimpleSEF', 'ModifyAdvancedSettings'),
-			'alias' => array('SimpleSEF', 'ModifyAliasSettings'),
-		);
-
-		loadGeneralSettingParameters($subActions, 'basic');
-
-		// Load up all the tabs...
-		$context[$context['admin_menu_name']]['tab_data'] = array(
-			'title' => $txt['simplesef'],
-			'description' => $txt['simplesef_desc'],
-			'tabs' => array(
-				'basic' => array(
-				),
-				'advanced' => array(
-				),
-				'alias' => array(
-					'description' => $txt['simplesef_alias_desc'],
-				),
-			),
-		);
-
-		call_user_func($subActions[$_REQUEST['sa']]);
-	}
-
-	/**
-	 * Modifies the basic settings of SimpleSEF.
-	 *
-	 * @global string $scripturl
-	 * @global array $txt
-	 * @global array $context
-	 * @global array $modSettings
-	 */
-	public static function ModifyBasicSettings()
-	{
-		global $scripturl, $txt, $context, $modSettings;
-
-		$config_vars = array(
-			array('check', 'simplesef_enable', 'subtext' => $txt['simplesef_enable_desc']),
-			array('check', 'simplesef_simple', 'subtext' => $txt['simplesef_simple_desc']),
-			array('text', 'simplesef_space', 'size' => 6, 'subtext' => $txt['simplesef_space_desc']),
-			array('text', 'simplesef_suffix', 'subtext' => $txt['simplesef_suffix_desc']),
-			array('check', 'simplesef_advanced', 'subtext' => $txt['simplesef_advanced_desc']),
-		);
-
-		$context['post_url'] = $scripturl . '?action=admin;area=simplesef;sa=basic;save';
-
-		// Saving?
-		if (isset($_GET['save']))
-		{
-			checkSession();
-
-			if (trim($_POST['simplesef_suffix']) == '')
-				fatal_lang_error('simplesef_suffix_required');
-
-			$_POST['simplesef_suffix'] = trim($_POST['simplesef_suffix'], '.');
-
-			$save_vars = $config_vars;
-
-			// We don't want to break boards, so we'll make sure some stuff exists before actually enabling
-			if (!empty($_POST['simplesef_enable']) && empty($modSettings['simplesef_enable']))
-			{
-				if (strpos($_SERVER['SERVER_SOFTWARE'], 'IIS') !== false && file_exists(BOARDDIR . '/web.config'))
-					$_POST['simplesef_enable'] = strpos(implode('', file(BOARDDIR . '/web.config')), '<action type="Rewrite" url="index.php?q={R:1}"') !== false ? 1 : 0;
-				elseif (strpos($_SERVER['SERVER_SOFTWARE'], 'IIS') === false && file_exists(BOARDDIR . '/.htaccess'))
-					$_POST['simplesef_enable'] = strpos(implode('', file(BOARDDIR . '/.htaccess')), 'RewriteRule ^(.*)$ index.php') !== false ? 1 : 0;
-				elseif (strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false)
-					$_POST['simplesef_enable'] = 1;
-				elseif (strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false)
-					$_POST['simplesef_enable'] = 1;
-				else
-					$_POST['simplesef_enable'] = 0;
-			}
-
-			saveDBSettings($save_vars);
-
-			redirectexit('action=admin;area=simplesef;sa=basic');
-		}
-
-		prepareDBSettingContext($config_vars);
-	}
-
-	/**
-	 * Modifies the advanced settings for SimpleSEF.  Most setups won't need to
-	 * touch this (except for maybe other languages)
-	 *
-	 * @global string $scripturl
-	 * @global array $txt
-	 * @global array $context
-	 * @global array $modSettings
-	 * @global array $settings
-	 */
-	public static function ModifyAdvancedSettings()
-	{
-		global $scripturl, $txt, $context, $modSettings, $settings;
-
-		loadTemplate('SimpleSEF');
-		$config_vars = array(
-			array('check', 'simplesef_lowercase', 'subtext' => $txt['simplesef_lowercase_desc']),
-			array('large_text', 'simplesef_strip_words', 'size' => 6, 'subtext' => $txt['simplesef_strip_words_desc']),
-			array('large_text', 'simplesef_strip_chars', 'size' => 6, 'subtext' => $txt['simplesef_strip_chars_desc']),
-			array('check', 'simplesef_debug', 'subtext' => $txt['simplesef_debug_desc']),
-			'',
-			array('callback', 'simplesef_ignore'),
-			array('title', 'title', 'label' => $txt['simplesef_action_title']),
-			array('desc', 'desc', 'label' => $txt['simplesef_action_desc']),
-			array('text', 'simplesef_actions', 'size' => 50, 'disabled' => 'disabled', 'preinput' => '<input type="hidden" name="simplesef_actions" value="' . $modSettings['simplesef_actions'] . '" />'),
-			array('text', 'simplesef_useractions', 'size' => 50, 'disabled' => 'disabled', 'preinput' => '<input type="hidden" name="simplesef_useractions" value="' . $modSettings['simplesef_useractions'] . '" />'),
-		);
-
-		// Prepare the actions and ignore list
-		$context['simplesef_dummy_ignore'] = !empty($modSettings['simplesef_ignore_actions']) ? explode(',', $modSettings['simplesef_ignore_actions']) : array();
-		$context['simplesef_dummy_actions'] = array_diff(explode(',', $modSettings['simplesef_actions']), $context['simplesef_dummy_ignore']);
-		$context['html_headers'] .= '<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/SelectSwapper.js?rc5"></script>';
-
-		$context['post_url'] = $scripturl . '?action=admin;area=simplesef;sa=advanced;save';
-		$context['settings_post_javascript'] = '
-			function editAreas()
-			{
-				document.getElementById("simplesef_actions").disabled = "";
-				document.getElementById("setting_simplesef_actions").nextSibling.nextSibling.style.color = "";
-				document.getElementById("simplesef_useractions").disabled = "";
-				document.getElementById("setting_simplesef_useractions").nextSibling.nextSibling.style.color = "";
-				return false;
-			}
-			var swapper = new SelectSwapper({
-				sFromBoxId			: "dummy_actions",
-				sToBoxId			: "dummy_ignore",
-				sToBoxHiddenId		: "simplesef_ignore_actions",
-				sAddButtonId		: "simplesef_ignore_add",
-				sAddAllButtonId		: "simplesef_ignore_add_all",
-				sRemoveButtonId		: "simplesef_ignore_remove",
-				sRemoveAllButtonId	: "simplesef_ignore_remove_all"
-			});';
-
-		// Saving?
-		if (isset($_GET['save']))
-		{
-			checkSession();
-
-			$save_vars = $config_vars;
-
-			// Ignoring any actions??
-			$save_vars[] = array('text', 'simplesef_ignore_actions');
-
-			saveDBSettings($save_vars);
-
-			redirectexit('action=admin;area=simplesef;sa=advanced');
-		}
-
-		prepareDBSettingContext($config_vars);
-	}
-
-	/**
-	 * Modifies the Action Aliasing settings
-	 *
-	 * @global string $scripturl
-	 * @global array $txt
-	 * @global array $context
-	 * @global array $modSettings
-	 */
-	public static function ModifyAliasSettings()
-	{
-		global $scripturl, $txt, $context, $modSettings;
-
-		loadTemplate('SimpleSEF');
-		$context['sub_template'] = 'alias_settings';
-
-		$context['simplesef_aliases'] = !empty($modSettings['simplesef_aliases']) ? unserialize($modSettings['simplesef_aliases']) : array();
-
-		$context['post_url'] = $scripturl . '?action=admin;area=simplesef;sa=alias';
-
-		if (isset($_POST['save']))
-		{
-			checkSession();
-
-			// Start with some fresh arrays
-			$alias_original = array();
-			$alias_new = array();
-
-			// Clean up the passed in arrays
-			if (isset($_POST['original'], $_POST['alias']))
-			{
-				// Make sure we don't allow duplicate actions or aliases
-				$_POST['original'] = array_unique(array_filter($_POST['original'], create_function('$x', 'return $x != \'\';')));
-				$_POST['alias'] = array_unique(array_filter($_POST['alias'], create_function('$x', 'return $x != \'\';')));
-				$alias_original = array_intersect_key($_POST['original'], $_POST['alias']);
-				$alias_new = array_intersect_key($_POST['alias'], $_POST['original']);
-			}
-
-			$aliases = !empty($alias_original) ? array_combine($alias_original, $alias_new) : array();
-
-			// One last check
-			foreach ($aliases as $orig => $alias)
-				if ($orig == $alias)
-					unset($aliases[$orig]);
-
-			$updates = array(
-				'simplesef_aliases' => serialize($aliases),
-			);
-
-			updateSettings($updates);
-
-			redirectexit('action=admin;area=simplesef;sa=alias');
-		}
 	}
 
 	/**
@@ -963,7 +743,7 @@ class SimpleSEF
 
 	/**
 	 * Takes the q= part of the query string passed in and tries to find out
-	 * how to put the URL into terms SMF can understand.  If it can't, it forces
+	 * how to put the URL into terms ELK can understand.  If it can't, it forces
 	 * the action to SimpleSEF's own 404 action and throws a nice error page.
 	 *
 	 * @global string $boardurl

@@ -24,12 +24,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-// If SSI.php is in the same place as this file, and SMF isn't defined, this is being run standalone.
-if (!defined('SMF') && file_exists(dirname(__FILE__) . '/SSI.php'))
+// If SSI.php is in the same place as this file, and ELK isn't defined, this is being run standalone.
+if (!defined('ELK') && file_exists(dirname(__FILE__) . '/SSI.php'))
 	require_once(dirname(__FILE__) . '/SSI.php');
-// Hmm... no SSI.php and no SMF?
-elseif (!defined('SMF'))
-	die('<b>Error:</b> Cannot install - please verify you put this in the same place as SMF\'s index.php.');
+// Hmm... no SSI.php and no ELK?
+elseif (!defined('ELK'))
+	die('<b>Error:</b> Cannot install - please verify you put this in the same place as ELK\'s index.php.');
 
 pre_install_check();
 
@@ -54,7 +54,7 @@ $sef_functions = array(
 	'integrate_redirect' => 'SimpleSEF::fixRedirectUrl',
 	'integrate_outgoing_email' => 'SimpleSEF::fixEmailOutput',
 	'integrate_exit' => 'SimpleSEF::fixXMLOutput',
-	'integrate_pre_include' => $sourcedir . '/SimpleSEF.php',
+	'integrate_pre_include' => 'SOURCEDIR/SimpleSEF.php',
 	'integrate_load_theme' => 'SimpleSEF::loadTheme',
 	'integrate_admin_areas' => 'SimpleSEF::adminAreas',
 	'integrate_menu_buttons' => 'SimpleSEF::menuButtons',
@@ -67,7 +67,7 @@ foreach ($sef_functions as $hook => $function)
 if (addHtaccess() === false)
 	log_error('Could not add or edit .htaccess file upon install of SimpleSEF', 'debug');
 
-if (SMF == 'SSI')
+if (ELK == 'SSI')
 {
 	fatal_error('<b>This isn\'t really an error, just a message telling you that the settings have been entered into the database!</b><br />');
 	@unlink(__FILE__);
