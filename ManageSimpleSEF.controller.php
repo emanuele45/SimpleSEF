@@ -64,7 +64,6 @@ class SimpleSEF_Controller extends Action_Controller
 		$action = new Action();
 		$action->initialize($subActions, 'basic');
 
-		loadLanguage('SimpleSEF');
 		loadTemplate('SimpleSEF');
 
 		// Load up all the tabs...
@@ -226,7 +225,7 @@ class SimpleSEF_Controller extends Action_Controller
 	 */
 	private function _initSSEF_advancedSettingsForm()
 	{
-		global $txt;
+		global $txt, $modSettings;
 
 		// instantiate the form
 		$this->_SSEF_advancedSettings = new Settings_Form();

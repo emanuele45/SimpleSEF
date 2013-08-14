@@ -181,6 +181,13 @@ class SimpleSEF
 		{
 			$querystring = self::route($_GET['q']);
 			$_GET = $querystring + $_GET;
+			$_REQUEST = $_POST + $_GET;
+
+			// Make sure REMOTE_ADDR, other IPs, and the like are parsed
+			$req = request();
+
+			// Parse the $_REQUEST and make sure things like board, topic don't have weird stuff
+			$req->parseRequest();
 		}
 
 		// Need to grab any extra query parts from the original url and tack it on here
@@ -613,9 +620,9 @@ class SimpleSEF
 		self::log('Fixed up integration hooks: ' . var_export($fixups, true));
 	}
 
-	/*	 * ******************************************
-	 * 			Utility Functions				*
-	 * ****************************************** */
+	/********************************************
+	 *           Utility Functions              *
+	 ********************************************/
 
 	/**
 	 * Takes in a board name and tries to determine it's id
