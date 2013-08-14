@@ -804,7 +804,7 @@ class SimpleSEF
 		{
 			$current_value = array_pop($url_parts);
 
-			if (strrpos($current_value, $modSettings['simplesef_suffix']) || $url_parts[count($url_parts) - 1] == 't')
+			if ((!empty($modSettings['simplesef_simple']) && (substr($current_value, 0, 6) === 'topic_')) || strrpos($current_value, $modSettings['simplesef_suffix']) || (isset($url_parts[count($url_parts) - 1]) && $url_parts[count($url_parts) - 1] == 't'))
 			{
 				// remove the suffix and get the topic id
 				$topic = str_replace($modSettings['simplesef_suffix'], '', $current_value);
@@ -814,7 +814,7 @@ class SimpleSEF
 				// remove the board name too
 				if (empty($modSettings['simplesef_simple']))
 				{
-					if ($url_parts[count($url_parts) - 1] == 't')
+					if (isset($url_parts[count($url_parts) - 1]) && $url_parts[count($url_parts) - 1] == 't')
 						array_pop($url_parts);
 
 					array_pop($url_parts);
@@ -823,7 +823,7 @@ class SimpleSEF
 			else
 			{
 				//check to see if the last one in the url array is a board
-				if (preg_match('~^board_(\d+)$~', $current_value, $match))
+				if (preg_match('~^board_([\d]+(\.[\d]+)?)$~', $current_value, $match))
 					$boardId = $match[1];
 				else
 					$boardId = self::getBoardId($current_value);
