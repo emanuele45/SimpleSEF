@@ -983,9 +983,7 @@ class SimpleSEF
 
 	/**
 	 * The encode function is responsible for transforming any string of text
-	 * in the URL into something that looks good and representable.  For forums
-	 * not using ASCII or UTF8 character sets, we convert them to utf8 and then
-	 * transliterate them.
+	 * in the URL into something that looks good and representable.
 	 *
 	 * @global array $modSettings
 	 * @global array $txt
@@ -1000,18 +998,6 @@ class SimpleSEF
 
 		if (empty($string))
 			return '';
-
-		// We need to make sure all strings are either ISO-8859-1 or UTF-8 and if not, convert to UTF-8 (if the host has stuff installed right)
-		$char_set = empty($modSettings['global_character_set']) ? $txt['lang_character_set'] : $modSettings['global_character_set'];
-		if ($char_set != 'ISO-8859-1' && $char_set != 'UTF-8')
-		{
-			if (function_exists('iconv'))
-				$string = iconv($char_set, 'UTF-8//IGNORE', $string);
-			elseif (function_exists('mb_convert_encoding'))
-				$string = mb_convert_encoding($string, 'UTF8', $char_set);
-			elseif (function_exists('unicode_decode'))
-				$string = unicode_decode($string, $char_set);
-		}
 
 		// A way to track/store the current character
 		$character = 0;
