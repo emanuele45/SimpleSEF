@@ -8,7 +8,7 @@ http://www.yourboard.com/index.php?topic=1.0 =>> http://www.yourboard.com/genera
 http://www.yourboard.com/index.php?action=profile =>> http://www.yourboard.com/profile
 
 Contribute to the initial developer Matt Zuba:
-[https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3751784)
+[ ![donate](https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3751784)
 
 Latest Version: 2.0
 
