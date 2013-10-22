@@ -1,4 +1,4 @@
-#SimpleSEF#
+# SimpleSEF #
 
 This mod creates content filled URLs for your forum.
 
