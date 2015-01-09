@@ -177,19 +177,19 @@ class SimpleSEF
 			exit();
 		}
 
-		// Parse the url
-		if (!empty($_GET['q']))
+		$tmp = str_replace(str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']), '', $_SERVER['REQUEST_URI']);
+		if (!empty($tmp) && $tmp !== '/')
 		{
-			$querystring = self::route($_GET['q']);
+			$querystring = self::route($tmp);
 			$_GET = $querystring + $_GET;
 			$_REQUEST = $_POST + $_GET;
-
-			// Make sure REMOTE_ADDR, other IPs, and the like are parsed
-			$req = request();
-
-			// Parse the $_REQUEST and make sure things like board, topic don't have weird stuff
-			$req->parseRequest();
 		}
+
+		// Make sure REMOTE_ADDR, other IPs, and the like are parsed
+		$req = request();
+
+		// Parse the $_REQUEST and make sure things like board, topic don't have weird stuff
+		$req->parseRequest();
 
 		// Need to grab any extra query parts from the original url and tack it on here
 		$_SERVER['QUERY_STRING'] = http_build_query($_GET, '', ';');
@@ -378,17 +378,7 @@ class SimpleSEF
 	 */
 	public static function actionArray(&$actions)
 	{
-		$actions['simplesef-404'] = array('SimpleSEF.php', array('SimpleSEF', 'http404NotFound'));
-	}
-
-	/**
-	 * Outputs a simple 'Not Found' message and the 404 header
-	 */
-	public static function http404NotFound()
-	{
-		header('HTTP/1.0 404 Not Found');
-		self::log('404 Not Found: ' . $_SERVER['REQUEST_URL']);
-		fatal_lang_error('simplesef_404', false);
+		$actions['simplesef-404'] = array('SimpleSEF.controller.php', array('SimpleSEF_Controller', 'action_index'));
 	}
 
 	/**
