@@ -42,7 +42,7 @@ class SimpleSEF_Controller extends Action_Controller
 		global $txt, $context;
 
 		// We're working with them settings here.
-		require_once(SUBSDIR . '/Settings.class.php');
+		require_once(SUBSDIR . '/SettingsForm.class.php');
 
 		$context['page_title'] = $txt['simplesef'];
 		$context['sub_template'] = 'show_settings';

@@ -31,14 +31,14 @@
     <version>2.1</version>
     <type>modification</type>
 
-    <install for="1.0 Alpha - 1.0.99">
+    <install for="1.0.1 - 1.0.99">
         <readme parsebbc="true">readme.txt</readme>
         <code>add_settings.php</code>
         <require-file name="SimpleSEF.php" destination="SOURCEDIR">Install the core SimpleSEF file</require-file>
         <require-file name="ManageSimpleSEF.controller.php" destination="ADMINDIR">The SimpleSEF administration panel</require-file>
         <require-file name="SimpleSEF.english.php" destination="LANGUAGEDIR">Language file with all language strings</require-file>
-        <require-file name="SimpleSEF.template.php" destination="$themedir">Template file for admin settings</require-file>
-        <require-file name="SelectSwapper.js" destination="$themedir/scripts">Javascript for ignoring actions</require-file>
+        <require-file name="SimpleSEF.template.php" destination="THEMEDIR">Template file for admin settings</require-file>
+        <require-file name="SelectSwapper.js" destination="THEMEDIR/scripts">Javascript for ignoring actions</require-file>
         <require-dir name="SimpleSEF-Db" destination="SOURCEDIR">Directory containing all translation data for non ASCII characters</require-dir>
         <require-dir name="SimpleSEF-Ext" destination="SOURCEDIR">Directory to store extensions in</require-dir>
         <code type="inline"><![CDATA[<?php
@@ -49,11 +49,11 @@
         <redirect type="inline" url="?action=admin;area=simplesef;sa=basic" timeout="7000">Thank you for installing SimpleSEF, you will now be redirected to the settings page.</redirect>
     </install>
 
-    <install for="1.0 Alpha - 1.0.99">
+    <install for="1.0.1 - 1.0.99">
         <code>remove_settings.php</code>
         <remove-file name="LANGUAGEDIR/SimpleSEF.english.php" />
-        <remove-file name="$themedir/SimpleSEF.template.php" />
-        <remove-file name="$themedir/scripts/SelectSwapper.js" />
+        <remove-file name="THEMEDIR/SimpleSEF.template.php" />
+        <remove-file name="THEMEDIR/scripts/SelectSwapper.js" />
         <remove-file name="SOURCEDIR/SimpleSEF.php" />
         <remove-dir name="SOURCEDIR/SimpleSEF-Db" />
     </uninstall>
