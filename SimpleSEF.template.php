@@ -83,7 +83,7 @@ function template_callback_simplesef_ignore()
 			</span>
 		</dt>
 		<dd>
-			<select id="dummy_actions" multiple="multiple" size="9" style="min-width: 100px;">';
+			<select id="dummy_actions" multiple="multiple" size="9">';
 	foreach ($context['simplesef_dummy_actions'] as $action)
 		echo '
 				<option value="', $action, '">', $action, '</option>';
@@ -95,7 +95,7 @@ function template_callback_simplesef_ignore()
 				<input type="button" id="simplesef_ignore_remove_all" value="&laquo;&laquo;" /><br />
 				<input type="button" id="simplesef_ignore_remove" value="&laquo;" /><br /><br />
 			</span>
-			<select id="dummy_ignore" multiple="multiple" size="9" style="min-width: 100px;">';
+			<select id="dummy_ignore" multiple="multiple" size="9">';
 	foreach ($context['simplesef_dummy_ignore'] as $action)
 		echo '
 				<option value="', $action, '">', $action, '</option>';

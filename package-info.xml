@@ -40,6 +40,7 @@
         <require-file name="SimpleSEF.english.php" destination="LANGUAGEDIR">Language file with all language strings</require-file>
         <require-file name="SimpleSEF.template.php" destination="THEMEDIR">Template file for admin settings</require-file>
         <require-file name="SelectSwapper.js" destination="THEMEDIR/scripts">Javascript for ignoring actions</require-file>
+        <require-file name="SimpleSEF.css" destination="THEMEDIR/css">Some styling</require-file>
         <require-dir name="SimpleSEF-Db" destination="SOURCEDIR">Directory containing all translation data for non ASCII characters</require-dir>
         <require-dir name="SimpleSEF-Ext" destination="SOURCEDIR">Directory to store extensions in</require-dir>
         <code type="inline"><![CDATA[<?php
@@ -55,6 +56,7 @@
         <remove-file name="LANGUAGEDIR/SimpleSEF.english.php" />
         <remove-file name="THEMEDIR/SimpleSEF.template.php" />
         <remove-file name="THEMEDIR/scripts/SelectSwapper.js" />
+        <remove-file name="THEMEDIR/css/SimpleSEF.css" />
         <remove-file name="SOURCEDIR/SimpleSEF.controller.php" />
         <remove-file name="ADMINDIR/ManageSimpleSEF.controller.php" />
         <remove-file name="CONTROLLERDIR/SimpleSEF.php" />

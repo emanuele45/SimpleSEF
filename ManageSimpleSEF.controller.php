@@ -59,13 +59,11 @@ class SimpleSEF_Controller extends Action_Controller
 				'function' => 'action_AliasSettings'),
 		);
 
-		// Default to sub action 'all'.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : 'basic';
-
-		$action = new Action();
-		$action->initialize($subActions, 'basic');
+		$action = new Action('simplesef_admin');
+		$subAction = $action->initialize($subActions, 'basic');
 
 		loadTemplate('SimpleSEF');
+		loadCSSFile('SimpleSEF.css');
 
 		// Load up all the tabs...
 		$context[$context['admin_menu_name']]['tab_data'] = array(
@@ -82,6 +80,7 @@ class SimpleSEF_Controller extends Action_Controller
 			),
 		);
 
+		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);
 	}
 
@@ -178,7 +177,7 @@ class SimpleSEF_Controller extends Action_Controller
 		// Prepare the actions and ignore list
 		$context['simplesef_dummy_ignore'] = !empty($modSettings['simplesef_ignore_actions']) ? explode(',', $modSettings['simplesef_ignore_actions']) : array();
 		$context['simplesef_dummy_actions'] = array_diff(explode(',', $modSettings['simplesef_actions']), $context['simplesef_dummy_ignore']);
-		$context['html_headers'] .= '<script type="text/javascript" src="' . $settings['default_theme_url'] . '/scripts/SelectSwapper.js?rc5"></script>';
+		loadJavascriptFile('SelectSwapper.js');
 
 		$context['post_url'] = $scripturl . '?action=admin;area=simplesef;sa=advanced;save';
 		$context['settings_post_javascript'] = '
