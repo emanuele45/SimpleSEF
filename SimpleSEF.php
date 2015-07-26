@@ -588,15 +588,15 @@ class SimpleSEF
 		$fixups = array();
 		if (!empty($hooks['integrate_pre_load']) && strpos($hooks['integrate_pre_load'], 'SimpleSEF') !== 0)
 		{
-			$fixups['integrate_pre_load'] = 'SimpleSEF::convertQueryString,' . str_replace(',SimpleSEF::convertQueryString', '', $hook['integrate_pre_load']);
+			$fixups['integrate_pre_load'] = 'SimpleSEF::convertQueryString,' . str_replace(',SimpleSEF::convertQueryString', '', $hooks['integrate_pre_load']);
 		}
 		if (!empty($hooks['integrate_buffer']) && strpos($hooks['integrate_buffer'], 'SimpleSEF') !== 0)
 		{
-			$fixups['integrate_buffer'] = 'SimpleSEF::ob_simplesef,' . str_replace(',SimpleSEF::ob_simplesef', '', $hook['integrate_buffer']);
+			$fixups['integrate_buffer'] = 'SimpleSEF::ob_simplesef,' . str_replace(',SimpleSEF::ob_simplesef', '', $hooks['integrate_buffer']);
 		}
 		if (!empty($hooks['integrate_exit']) && strpos($hooks['integrate_exit'], 'SimpleSEF') !== 0)
 		{
-			$fixups['integrate_exit'] = 'SimpleSEF::fixXMLOutput,' . str_replace(',SimpleSEF::fixXMLOutput', '', $hook['integrate_exit']);
+			$fixups['integrate_exit'] = 'SimpleSEF::fixXMLOutput,' . str_replace(',SimpleSEF::fixXMLOutput', '', $hooks['integrate_exit']);
 		}
 
 		if (!empty($fixups))
