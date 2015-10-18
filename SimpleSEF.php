@@ -181,6 +181,7 @@ class SimpleSEF
 		if (!empty($tmp) && $tmp !== '/')
 		{
 			$querystring = self::route($tmp);
+
 			$_GET = $querystring + $_GET;
 			$_REQUEST = $_POST + $_GET;
 		}
@@ -753,6 +754,8 @@ class SimpleSEF
 	{
 		global $boardurl, $modSettings;
 
+		$parts = parse_url($boardurl);
+		$query = substr($query, strlen($parts['path']));
 		$url_parts = explode('/', trim($query, '/'));
 		$querystring = array();
 
@@ -795,7 +798,11 @@ class SimpleSEF
 		{
 			$current_value = array_pop($url_parts);
 
-			if ((!empty($modSettings['simplesef_simple']) && (substr($current_value, 0, 6) === 'topic_')) || strrpos($current_value, $modSettings['simplesef_suffix']) || (isset($url_parts[count($url_parts) - 1]) && $url_parts[count($url_parts) - 1] == 't'))
+			if (empty($current_value))
+			{
+				// This is not very nice to see.
+			}
+			elseif ((!empty($modSettings['simplesef_simple']) && (substr($current_value, 0, 6) === 'topic_')) || strrpos($current_value, $modSettings['simplesef_suffix']) || (isset($url_parts[count($url_parts) - 1]) && $url_parts[count($url_parts) - 1] == 't'))
 			{
 				// remove the suffix and get the topic id
 				$topic = str_replace($modSettings['simplesef_suffix'], '', $current_value);
